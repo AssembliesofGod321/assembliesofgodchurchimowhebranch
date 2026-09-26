@@ -46,6 +46,8 @@ footer{margin-top:35px;background:#4a2405;color:#fff;text-align:center;padding:2
   <script type="module">
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
   // TODO: Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -61,6 +63,48 @@ footer{margin-top:35px;background:#4a2405;color:#fff;text-align:center;padding:2
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    async function loadChurchData() {
+  const announcementsBox = document.querySelector("#announcements > div");
+  const eventsBox = document.querySelector("#events > div");
+
+  const announcementsSnapshot = await getDocs(collection(db, "announcements"));
+  announcementsBox.innerHTML = "";
+
+  announcementsSnapshot.forEach((doc) => {
+    const data = doc.data();
+
+    announcementsBox.innerHTML += `
+      <div class="card">
+        <h3>${data.title || ""}</h3>
+        <p>${data.message || data.description || ""}</p>
+        <p><strong>Date:</strong> ${data.date || ""}</p>
+        <p><strong>Time:</strong> ${data.time || ""}</p>
+        <p><strong>Location:</strong> ${data.location || ""}</p>
+      </div>
+    `;
+  });
+
+  const eventsSnapshot = await getDocs(collection(db, "events"));
+  eventsBox.innerHTML = "";
+
+  eventsSnapshot.forEach((doc) => {
+    const data = doc.data();
+
+    eventsBox.innerHTML += `
+      <div class="card">
+        <h3>${data.title || ""}</h3>
+        <p>${data.description || ""}</p>
+        <p><strong>Date:</strong> ${data.date || ""}</p>
+        <p><strong>Time:</strong> ${data.time || ""}</p>
+        <p><strong>Location:</strong> ${data.location || ""}</p>
+        <p><strong>Host:</strong> ${data.host || ""}</p>
+      </div>
+    `;
+  });
+}
+
+loadChurchData();
   </script>
 </body>
 </html>
